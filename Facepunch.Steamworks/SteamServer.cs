@@ -28,11 +28,11 @@ namespace Steamworks
 
 		internal static void InstallEvents()
 		{
-            Dispatch.Install<ValidateAuthTicketResponse_t>( x => OnValidateAuthTicketResponse?.Invoke( x.SteamID, x.OwnerSteamID, x.AuthSessionResponse ), true );
+			Dispatch.Install<ValidateAuthTicketResponse_t>( x => OnValidateAuthTicketResponse?.Invoke( x.SteamID, x.OwnerSteamID, x.AuthSessionResponse ), true );
 			Dispatch.Install<SteamServersConnected_t>( x => OnSteamServersConnected?.Invoke(), true );
 			Dispatch.Install<SteamServerConnectFailure_t>( x => OnSteamServerConnectFailure?.Invoke( x.Result, x.StillRetrying ), true );
 			Dispatch.Install<SteamServersDisconnected_t>( x => OnSteamServersDisconnected?.Invoke( x.Result ), true );
-			Dispatch.Install<SteamNetAuthenticationStatus_t>(x => OnSteamNetAuthenticationStatus?.Invoke(x.Avail), true);
+			Dispatch.Install<SteamNetAuthenticationStatus_t>( x => OnSteamNetAuthenticationStatus?.Invoke( x.Avail ), true );
 		}
 
 		/// <summary>
@@ -215,7 +215,7 @@ namespace Steamworks
 		/// </summary>
 		public static string ModDir
 		{
-			get => _modDir; 
+			get => _modDir;
 			internal set { if ( _modDir == value ) return; Internal.SetModDir( value ); _modDir = value; }
 		}
 		private static string _modDir = "";
@@ -319,9 +319,9 @@ namespace Steamworks
 		public static bool AutomaticHeartbeats
 		{
 			set { Internal.SetAdvertiseServerActive( value ); }
-		}		
-		
-		
+		}
+
+
 		/// <summary>
 		/// Enable or disable heartbeats, which are sent regularly to the master server.
 		/// Enabled by default.
@@ -387,16 +387,11 @@ namespace Steamworks
 		/// <summary>
 		/// Start authorizing a ticket. This user isn't authorized yet. Wait for a call to OnAuthChange.
 		/// </summary>
-		public static unsafe bool BeginAuthSession( byte[] data, SteamId steamid )
+		public static unsafe BeginAuthResult BeginAuthSession( byte[] ticketData, SteamId steamid )
 		{
-			fixed ( byte* p = data )
+			fixed ( byte* ptr = ticketData )
 			{
-				var result = Internal.BeginAuthSession( (IntPtr)p, data.Length, steamid );
-
-				if ( result == BeginAuthResult.OK )
-					return true;
-
-				return false;
+				return Internal.BeginAuthSession( (IntPtr)ptr, ticketData.Length, steamid );
 			}
 		}
 
@@ -446,15 +441,15 @@ namespace Steamworks
 				HandleIncomingPacket( (IntPtr)ptr, size, address, port );
 			}
 		}
-		
+
 		/// <summary>
 		/// We have received a server query on our game port. Pass it to Steam to handle.
 		/// </summary>
 		public static unsafe void HandleIncomingPacket( IntPtr ptr, int size, uint address, ushort port )
 		{
 			Internal.HandleIncomingPacket( ptr, size, address, port );
-		}		
-		
+		}
+
 		/// <summary>
 		/// Does the user own this app (which could be DLC).
 		/// </summary>
