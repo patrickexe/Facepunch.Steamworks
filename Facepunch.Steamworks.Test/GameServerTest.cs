@@ -76,7 +76,7 @@ namespace Steamworks
 			//
 			// Server gets the ticket, starts authing
 			//
-			if ( !SteamServer.BeginAuthSession( ticketData, clientSteamId ) )
+			if (SteamServer.BeginAuthSession( ticketData, clientSteamId ) != BeginAuthResult.OK)
 			{
 				Assert.Fail( "BeginAuthSession returned false, called bullshit without even having to check with Gabe" );
 			}
